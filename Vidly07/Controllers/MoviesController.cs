@@ -33,6 +33,54 @@ namespace Vidly07.Controllers
 			var movie = _context.Movies.Include(m => m.Genre).SingleOrDefault(m=>m.Id==Id);
 			return View(movie);
 		}
+		public ActionResult New()
+		{
+			var genres = _context.Genres.ToList();
+			var ViewModel = new MovieFormViewModel
+			{
+				Genres = genres
+			};
+			return View("MovieForm",ViewModel);
+		}
+		[HttpPost]
+		public ActionResult save(Movie movie)
+		{
+			if (movie.Id==0)
+			{
+				movie.DateAdded = DateTime.Now;
+				_context.Movies.Add(movie);
+			}
+			else
+			{
+				var MovieInDb = _context.Movies.Single(m => m.Id == movie.Id);
+				MovieInDb.Name = movie.Name;
+				MovieInDb.GenreId = movie.GenreId;
+				MovieInDb.RelaseDate = movie.RelaseDate;
+				MovieInDb.NumberInStock= movie.NumberInStock;
+			}
+
+			_context.SaveChanges();
+
+
+			return RedirectToAction("Index","Movies");
+		}
+
+		public ActionResult Edit(int Id)
+		{
+			var movie = _context.Movies.SingleOrDefault(m=>m.Id==Id);
+			if (movie==null)
+			{
+				return HttpNotFound();
+			}
+
+			var viewModel = new MovieFormViewModel
+			{
+				Movie = movie,
+				Genres = _context.Genres.ToList()
+			};
+			return View("MovieForm",viewModel);
+		}
+
 		// GET: Movies
 		public ActionResult Random()
         {
