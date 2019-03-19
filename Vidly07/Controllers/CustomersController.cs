@@ -51,7 +51,7 @@ namespace Vidly07.Controllers
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]  
+		[ValidateAntiForgeryToken]
 		public ActionResult Save(Customer customer)
 		{//receive from CustomerForm View
 
@@ -59,9 +59,10 @@ namespace Vidly07.Controllers
 			{
 				var viewModel = new CustomerFormViewModel
 				{
-					Customer = customer,
-					MembershipTypes = _context.MembershipTypes.ToList()
-				};
+				   Customer = customer,
+				   MembershipTypes = _context.MembershipTypes.ToList()
+			};
+
 				return View("CustomerForm",viewModel);
 			}
 			if (customer.Id == 0)

@@ -9,24 +9,24 @@ using Vidly07.ViewModels;
 
 namespace Vidly07.Controllers
 {
-    public class MoviesController : Controller
-    {
-	    private ApplicationDbContext _context;
+	public class MoviesController : Controller
+	{
+		private ApplicationDbContext _context;
 
-	    public MoviesController()
-	    {
-		    _context=new ApplicationDbContext();
-	    }
-	    protected override void Dispose(bool diposing)
-	    {
+		public MoviesController()
+		{
+			_context=new ApplicationDbContext();
+		}
+		protected override void Dispose(bool diposing)
+		{
 			_context.Dispose();
-	    }
+		}
 		public ViewResult Index()
-	    {
-		    var movies = _context.Movies.Include(m=>m.Genre).ToList();
+		{
+			var movies = _context.Movies.Include(m=>m.Genre).ToList();
 
-		    return View(movies);
-	    }
+			return View(movies);
+		}
 
 		public ActionResult Details(int Id)
 		{
@@ -43,8 +43,18 @@ namespace Vidly07.Controllers
 			return View("MovieForm",ViewModel);
 		}
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public ActionResult save(Movie movie)
-		{
+		{//receive from MovieForm View
+
+			if (!ModelState.IsValid)
+			{//send data to view model to check it valid or not.
+				var viewModel = new MovieFormViewModel
+				{
+					Genres = _context.Genres.ToList()
+				};
+				return View("MovieForm",viewModel);
+			}
 			if (movie.Id==0)
 			{
 				movie.DateAdded = DateTime.Now;
@@ -73,9 +83,8 @@ namespace Vidly07.Controllers
 				return HttpNotFound();
 			}
 
-			var viewModel = new MovieFormViewModel
+			var viewModel = new MovieFormViewModel(movie)
 			{
-				Movie = movie,
 				Genres = _context.Genres.ToList()
 			};
 			return View("MovieForm",viewModel);
@@ -83,20 +92,20 @@ namespace Vidly07.Controllers
 
 		// GET: Movies
 		public ActionResult Random()
-        {
-	        var movie = new Movie() {Name = "shrek" };
+		{
+			var movie = new Movie() {Name = "shrek" };
 			var customers = new List<Customer>
 			{
 				new Customer{Name = "Customer 1"},
 				new Customer{Name = "Customer 2"}
 			};
 
-	        var viewModel = new RandomMovieViewModel
-	        {
+			var viewModel = new RandomMovieViewModel
+			{
 				Movie = movie,
 				Customers = customers
-	        };
-            return View(viewModel);
-        }
-    }
+			};
+			return View(viewModel);
+		}
+	}
 }
